@@ -33,7 +33,7 @@ export const categoryApi = createApi({
     }),
     updateCategory: build.mutation<void, Pick<ICategory, 'id'> & Partial<ICategory>>({
       query: ({ id, ...patch }) => ({
-        url: `categories/update/`,
+        url: `categories/update`,
         method: 'PATCH',
         body: { id, ...patch },
       }),
@@ -42,11 +42,9 @@ export const categoryApi = createApi({
     deleteCategory: build.mutation<{ success: boolean; id: string }, string>({
       query(id) {
         return {
-          url: `categories/destroy/`,
+          url: `categories/destroy`,
           method: 'DELETE',
-          credentials: 'include',
-          mode: 'cors',
-          body: id
+          body: { id }
         }
       },
       invalidatesTags: (result, error, id) => [{ type: 'Category', id }],

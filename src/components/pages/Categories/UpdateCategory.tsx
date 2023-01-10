@@ -10,10 +10,6 @@ const UpdateCategory = () => {
   const {data: category, isLoading, error, isError} = useGetCategoryQuery(id)
   const [updateCategory, { isLoading: isUpdateLoading, error: updateError, isError: isUpdateError, data }] = useUpdateCategoryMutation()
 
-  console.log("data => ", data)
-  console.log("updateError => ", updateError)
-  console.log("isUpdateError => ", isUpdateError)
-
   const handleSubmit = (values: FormikValues) => {
     updateCategory(values as ICategory)
   }

@@ -22,21 +22,6 @@ const INITIAL_FORM_STATE: ICategory = {
   }
 }
 
-const categoriesList = [
-  {
-    id: 1,
-    title: 'Категория 1'
-  },
-  {
-    id: 2,
-    title: 'Категория 2'
-  },
-  {
-    id: 3,
-    title: 'Категория 3'
-  },
-]
-
 const AddUpdateForm: FC<AddUpdateFormProps> = ({ formState, onSubmit }) => {
   const {data: categories, isLoading, error} = useGetCategoriesQuery()
 
