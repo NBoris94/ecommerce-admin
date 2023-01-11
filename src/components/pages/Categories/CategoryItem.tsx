@@ -1,15 +1,39 @@
 import Link from "next/link"
-import {FC} from "react"
+import {FC, useEffect, useState} from "react"
 import {ICategory} from "@/types/category"
 
 interface CategoryItemProps extends ICategory {
-  handleDelete: (id :string) => void
+  checked: boolean
+  handleAddToChecked: (id :number) => void
+  handleDeleteFromChecked: (id :number) => void
+  handleDelete: (id :number) => void
 }
 
-const CategoryItem: FC<CategoryItemProps> = ({ id, name, children_categories, handleDelete }) => {
+const CategoryItem: FC<CategoryItemProps> = (
+  {
+    id,
+    name,
+    checked,
+    handleAddToChecked,
+    handleDeleteFromChecked,
+    handleDelete
+  }
+) => {
+  const handleChange = () => {
+    if (!checked) {
+      handleAddToChecked(id)
+    }
+    else {
+      handleDeleteFromChecked(id)
+    }
+  }
+
   return (
     <>
       <tr>
+        <td>
+          <input className="form-check-input" type="checkbox" checked={checked} onChange={handleChange} />
+        </td>
         <td>{name}</td>
         <td>
           <div className="btn-group btn-group-sm">

@@ -1,7 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import {ICategory} from "@/types/category"
+import {IListResponse} from "@/store/types"
 
-type CategoriesResponse = ICategory[]
+interface CategoryResponse {
+  categories: IListResponse<ICategory>
+  ids: number[]
+}
 
 export const categoryApi = createApi({
   baseQuery: fetchBaseQuery({
@@ -9,12 +13,12 @@ export const categoryApi = createApi({
   }),
   tagTypes: ['Category'],
   endpoints: (build) => ({
-    getCategories: build.query<CategoriesResponse, void>({
-      query: () => 'categories/getAllCategoriesWithChildren',
+    getCategories: build.query<CategoryResponse, number | void>({
+      query: (page = 1) => `categories/getAllCategoriesWithChildren?page=${page}`,
       providesTags: (result) =>
         result
           ? [
-            ...result.map(({ id }) => ({ type: 'Category' as const, id })),
+            ...result.categories.data.map(({ id }) => ({ type: 'Category' as const, id })),
             { type: 'Category', id: 'LIST' },
           ]
           : [{ type: 'Category', id: 'LIST' }],
@@ -39,7 +43,7 @@ export const categoryApi = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Category', id }],
     }),
-    deleteCategory: build.mutation<{ success: boolean; id: string }, string>({
+    deleteCategory: build.mutation<{ success: boolean; id: number }, number>({
       query(id) {
         return {
           url: `categories/destroy`,
@@ -49,6 +53,16 @@ export const categoryApi = createApi({
       },
       invalidatesTags: (result, error, id) => [{ type: 'Category', id }],
     }),
+    deleteCategories: build.mutation<{ success: boolean; id: number }, number[]>({
+      query(ids) {
+        return {
+          url: `categories/destroy`,
+          method: 'DELETE',
+          body: { id: ids }
+        }
+      },
+      invalidatesTags: (result, error, ids) => [{ type: 'Category', id: 'LIST' }],
+    }),
   }),
 })
 
@@ -57,5 +71,6 @@ export const {
   useGetCategoryQuery,
   useAddCategoryMutation,
   useUpdateCategoryMutation,
-  useDeleteCategoryMutation
+  useDeleteCategoryMutation,
+  useDeleteCategoriesMutation
 } = categoryApi

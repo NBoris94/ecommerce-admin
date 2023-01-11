@@ -14,7 +14,7 @@ export type SEO = {
 export type OpenGraph = {}
 
 export interface IBaseEntity {
-  id: string
+  id: number
   name: string
   createdDate?: Date
   modifiedDate?: Date
