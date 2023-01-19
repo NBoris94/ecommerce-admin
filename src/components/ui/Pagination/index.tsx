@@ -1,41 +1,43 @@
-import {FC} from "react"
+import {FC, useEffect, useState} from "react"
 import classNames from "classnames"
+import {useRouter} from "next/router";
+import {PaginationProps} from "./Pagination.interfaces";
 
-interface PaginationProps {
-  page: number,
-  last_page: number,
-  setPage: (value: number | ((prev: number) => number)) => void,
-}
+const Pagination: FC<PaginationProps> = (
+  {
+    currentPage,
+    pagesCount,
+  }
+) => {
+  const router = useRouter()
 
-const Pagination: FC<PaginationProps> = ({ page, last_page, setPage }) => {
-  let pages: number[] = []
-  for (let i = 1; i <= last_page; i++) {
-    pages.push(i)
+  const handleChangePage = (page: number) => {
+    router.push({pathname: router.pathname, query: { ...router.query, page }})
   }
 
   return (
-    <ul className="pagination">
+    <ul className="pagination flex-wrap">
       <li className="page-item">
         <button
           className="page-link"
           aria-label="Previous"
-          onClick={() => setPage(prev => prev - 1)}
-          disabled={page === 1}
+          onClick={() => handleChangePage(currentPage - 1)}
+          disabled={currentPage === 1}
         >
           <span aria-hidden="true">&laquo;</span>
         </button>
       </li>
-      {pages?.map(pageItem => {
+      {new Array(pagesCount).fill('').map((i, index) => {
         return (
           <li
-            className={classNames('page-item', { 'active': page === pageItem })}
-            key={pageItem}
+            className={classNames('page-item', { 'active': currentPage === index + 1 })}
+            key={index + 1}
           >
             <button
               className="page-link"
-              onClick={() => setPage(pageItem)}
+              onClick={() => handleChangePage(index + 1)}
             >
-              {pageItem}
+              {index + 1}
             </button>
           </li>
         )
@@ -44,8 +46,8 @@ const Pagination: FC<PaginationProps> = ({ page, last_page, setPage }) => {
         <button
           className="page-link"
           aria-label="Next"
-          onClick={() => setPage(prev => prev + 1)}
-          disabled={page === last_page}
+          onClick={() => handleChangePage(currentPage + 1)}
+          disabled={currentPage === pagesCount}
         >
           <span aria-hidden="true">&raquo;</span>
         </button>
