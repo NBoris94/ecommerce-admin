@@ -2,14 +2,11 @@ import {FC, useState} from "react"
 import {Field, Form, Formik, FormikValues} from "formik"
 import {useGetCategoriesQuery} from "@/store/category/categoryApi"
 import {ICategory} from "@/types/category"
-
-interface AddUpdateFormProps  {
-  formState?: ICategory
-  onSubmit: (values: FormikValues) => void
-}
+import {AddUpdateFormProps} from "./Categories.interfaces";
+import {is} from "immutable";
 
 const INITIAL_FORM_STATE: ICategory = {
-  id: '',
+  id: 0,
   name: '',
   description: '',
   category_id: '',
@@ -22,8 +19,12 @@ const INITIAL_FORM_STATE: ICategory = {
   }
 }
 
-const AddUpdateForm: FC<AddUpdateFormProps> = ({ formState, onSubmit }) => {
-  const {data: categories, isLoading, error} = useGetCategoriesQuery()
+const AddUpdateForm: FC<AddUpdateFormProps> = (
+  {
+    formState,
+    onSubmit
+  }) => {
+  const {data: result, isLoading, isError, error} = useGetCategoriesQuery({ page: 0, search: ''})
 
   return (
     <Formik
@@ -49,19 +50,29 @@ const AddUpdateForm: FC<AddUpdateFormProps> = ({ formState, onSubmit }) => {
             as="textarea"
           />
         </div>
-        <div className="mb-3">
-          <label className="form-label" htmlFor="category_id">Название</label>
-          <Field
-            className="form-select"
-            id="category_id"
-            name="category_id"
-            as="select"
-          >
-            <option value={0}>Выберите категорию</option>
-            {categories && categories.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
-          </Field>
-        </div>
-        <button type="submit" className="btn btn-primary">Сохранить</button>
+        {
+          <div className="mb-3">
+            <label className="form-label" htmlFor="category_id">Родительская категория</label>
+            {
+              isLoading
+                ? <p>Загрузка</p>
+                : isError
+                  ? <p>Ошибка</p>
+                  : (
+                    <Field
+                      className="form-select"
+                      id="category_id"
+                      name="category_id"
+                      as="select"
+                    >
+                      <option value={0}>Выберите категорию</option>
+                      {result?.categories.data.map(category => <option key={category.id} value={category.id}>{category.name}</option>)}
+                    </Field>
+                  )
+            }
+          </div>
+        }
+        <button type="submit" className="btn btn-primary" disabled={isLoading || isError}>Сохранить</button>
       </Form>
     </Formik>
   )
