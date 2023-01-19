@@ -1,7 +1,12 @@
+import {GetServerSideProps} from "next";
+
 import Head from "next/head"
 import Layout from "@/components/Layout/Layout"
 import UpdateCategory from "@/components/pages/Categories/UpdateCategory"
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {props: {}}
+}
 const UpdateCategoryPage = () => {
   return (
     <>

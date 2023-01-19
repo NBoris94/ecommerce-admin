@@ -1,8 +1,11 @@
 import Head from "next/head"
 import Layout from "@/components/Layout/Layout"
-import Link from "next/link"
-import Categories from "@/components/pages/Categories/Categories"
 import AddCategory from "@/components/pages/Categories/AddCategory"
+import {GetServerSideProps} from "next";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {props: {}}
+}
 
 const AddCategoryPage = () => {
   return (
