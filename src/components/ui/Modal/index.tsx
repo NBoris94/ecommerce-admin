@@ -1,90 +1,70 @@
-import {FC, KeyboardEvent, useEffect, useRef, useState} from "react"
+import {FC} from "react"
+import {createPortal} from "react-dom"
+import {useA11yDialog} from "react-a11y-dialog";
 import {ModalProps} from "@/components/ui/Modal/modal.interfaces"
-import ModalContent from "@/components/ui/Modal/ModalContent"
-import ModalButton from "@/components/ui/Modal/ModalButton"
-import ModalOverlay from "@/components/ui/Modal/ModalOverlay"
+
+import Button from "@/components/ui/Button";
+
+import styles from './Modal.module.scss'
 
 const Modal: FC<ModalProps> = (
   {
-    ariaLabel,
-    btnClassName,
-    btnContent,
-    center = false,
-    children,
-    footerChildren,
-    size = 'lg',
-    scrollable = false,
-    staticBackdrop = false,
+    id,
     title,
+    btn,
+    children,
+    footer,
+    showCancelBtn = false,
   }
 ) => {
-  const [open, setOpen] = useState(false)
-  const btnOpenRef = useRef<HTMLButtonElement>(null)
-  const btnCloseRef = useRef<HTMLButtonElement>(null)
-  const modalNode = useRef<HTMLDivElement>(null)
-  const ESCAPE_KEY = 'Escape'
+  const [instance, attr] = useA11yDialog({
+    id,
+    role: 'dialog',
+    title,
+  })
 
-  useEffect(() => {
-    if (open) {
-      btnCloseRef.current!.focus()
-    } else {
-      btnOpenRef.current!.focus()
-    }
-  }, [open])
+  const dialog =  createPortal(
+    <div {...attr.container} className={styles.dialog}>
+      <div {...attr.overlay} className={styles.dialog__overlay} />
 
-  function toggleScrollLock() {
-    document.querySelector('body')!.classList.toggle('modal-open')
-  }
+      <div {...attr.dialog} className={styles.dialog__wrapper}>
+        <button {...attr.closeButton} className={styles.dialog__close}>
+          Закрыть
+        </button>
 
-  const onOpen = () => {
-    setOpen(true)
-    toggleScrollLock()
-  }
+        <p {...attr.title} className={styles.dialog__title}>
+          {title}
+        </p>
 
-  const onClose = () => {
-    setOpen(false)
-    toggleScrollLock()
-  }
+        <div className={styles.dialog__content}>
+          {children}
+        </div>
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === ESCAPE_KEY) {
-      onClose()
-    }
-  }
-
-  const onClickAway = (event: any) => {
-    if (modalNode.current && !modalNode.current.contains(event.target)) {
-      onClose()
-    }
-  }
+        <div className={styles.dialog__footer}>
+          {footer}
+          {!showCancelBtn ? null : (
+            <Button
+              type="button"
+              onClick={() => instance.hide()}
+            >
+              Отмена
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
+  )
 
   return (
     <>
-      <ModalContent
-        ariaLabel={ariaLabel}
-        buttonRef={btnCloseRef}
-        center={center}
-        footerChildren={footerChildren}
-        open={open}
-        mainChildren={children}
-        modalRef={modalNode}
-        onClickAway={onClickAway}
-        onClose={onClose}
-        onKeyDown={onKeyDown}
-        size={size}
-        scrollable={scrollable}
-        staticBackdrop={staticBackdrop}
-        title={title}
-      />
-      {open && <ModalOverlay />}
-
-      <ModalButton
-        onClick={onOpen}
-        className={btnClassName}
-        buttonRef={btnOpenRef}
+      <Button
+        type={btn.type}
+        onClick={() => instance.show()}
       >
-        {btnContent}
-      </ModalButton>
+        {btn.text}
+      </Button>
+      {dialog}
     </>
   )
 }
