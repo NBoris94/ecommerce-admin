@@ -1,15 +1,18 @@
-import {configureStore, ThunkAction, Action, ConfigureStoreOptions} from '@reduxjs/toolkit'
-import {categoryApi} from "@/store/category/categoryApi"
+import {configureStore, ThunkAction, Action, ConfigureStoreOptions, combineReducers} from '@reduxjs/toolkit'
+import {api} from "@/store/api";
 import modalReducer from "@/store/modal/modalSlice"
 
+
+const rootReducer = combineReducers({
+  modal: modalReducer,
+  [api.reducerPath]: api.reducer
+})
 export const createStore = (options?: ConfigureStoreOptions['preloadedState'] | undefined) => {
   return configureStore({
-    reducer: {
-      modal: modalReducer,
-      [categoryApi.reducerPath]: categoryApi.reducer
-    },
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(categoryApi.middleware),
+      getDefaultMiddleware().concat(api.middleware),
+    ...options
   })
 }
 
